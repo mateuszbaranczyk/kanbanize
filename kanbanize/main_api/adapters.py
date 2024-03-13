@@ -2,15 +2,22 @@ from abc import ABC, abstractmethod
 
 from requests import request
 
-from kanbanize.main_api.schemas import Task, TaskResponse
+from kanbanize.main_api.schemas import (
+    Group,
+    GroupResponse,
+    Table,
+    TableResponse,
+    Task,
+    TaskResponse,
+)
 
 
 class IAdapter(ABC):
-    address: str
+    location: str
 
     @abstractmethod
     def path(self, endpoint: str):
-        path = f"http://{self.address}/{endpoint}"
+        path = f"http://{self.location}/{endpoint}"
         return path
 
     @abstractmethod
@@ -35,15 +42,39 @@ class IAdapter(ABC):
 
 
 class TaskAdapter(IAdapter):
-    address = "localhost"
+    location = "localhost"
 
     def create(self, endpoint: str, object_: Task) -> TaskResponse:
         return super().create(endpoint, object_)
 
+    def get(self, endpoint: str, uuid: str) -> TaskResponse:
+        return super().get(endpoint, uuid)
+
+    def edit(self, endpoint: str, uuid: str, object_: Task) -> TaskResponse:
+        return super().edit(endpoint, uuid, object_)
+
 
 class GroupAdapter(IAdapter):
-    pass
+    location = "localhost"
+
+    def create(self, endpoint: str, object_: Group) -> GroupResponse:
+        return super().create(endpoint, object_)
+
+    def get(self, endpoint: str, uuid: str) -> GroupResponse:
+        return super().get(endpoint, uuid)
+
+    def edit(self, endpoint: str, uuid: str, object_: Group) -> GroupResponse:
+        return super().edit(endpoint, uuid, object_)
 
 
 class TableAdapter(IAdapter):
-    pass
+    location = "localhost"
+
+    def create(self, endpoint: str, object_: Table) -> TableResponse:
+        return super().create(endpoint, object_)
+
+    def get(self, endpoint: str, uuid: str) -> TableResponse:
+        return super().get(endpoint, uuid)
+
+    def edit(self, endpoint: str, uuid: str, object_: Table) -> TableResponse:
+        return super().edit(endpoint, uuid, object_)
