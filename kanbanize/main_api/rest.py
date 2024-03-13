@@ -1,6 +1,6 @@
 from fastapi.responses import RedirectResponse
 
-from kanbanize.main_api.main import app, group, table, task
+from kanbanize.main_api.run import app, group, table, task
 from kanbanize.main_api.schemas import (
     Group,
     GroupResponse,
