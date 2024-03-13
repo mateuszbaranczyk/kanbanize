@@ -9,9 +9,22 @@ class Task(BaseModel):
 
 class Table(BaseModel):
     name: str
-    tasks: Task
+    tasks: list[Task] = []
 
 
 class Group(BaseModel):
     name: str
-    tables: Table
+    project: str
+    tables: list[Table] = []
+
+
+class TaskResponse(Task):
+    uuid: str
+
+
+class GroupResponse(Group):
+    uuid: str
+
+
+class TableResponse(Table):
+    uuid: str
