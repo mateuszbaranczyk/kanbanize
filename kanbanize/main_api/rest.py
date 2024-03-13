@@ -1,6 +1,5 @@
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter
 
-from kanbanize.main_api.run import app, group, table, task
 from kanbanize.main_api.schemas import (
     Group,
     GroupResponse,
@@ -10,10 +9,9 @@ from kanbanize.main_api.schemas import (
     TaskResponse,
 )
 
-
-@app.get("/")
-async def read_root():
-    return RedirectResponse("/docs/")
+table = APIRouter(prefix="/table", tags=["table"])
+task = APIRouter(prefix="/task", tags=["task"])
+group = APIRouter(prefix="/group", tags=["group"])
 
 
 @table.post("/create")
@@ -65,8 +63,3 @@ async def get_task(uuid) -> TaskResponse:
 @task.patch("/edit/{uuid}")
 async def edit_task(uuid) -> TaskResponse:
     pass
-
-
-app.include_router(table)
-app.include_router(task)
-app.include_router(group)
