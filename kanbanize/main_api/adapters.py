@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from requests import request
 
-from kanbanize.main_api.schemas import (
+from kanbanize.data_structures.schemas import (
     Group,
     GroupResponse,
     Table,
