@@ -3,6 +3,9 @@ from typing import NewType
 from pydantic import BaseModel
 
 Uuid = NewType("Uuid", str)
+TaskUuid = NewType("TaskUuid", Uuid)
+GroupUuid = NewType("GroupUuid", Uuid)
+TableUuid = NewType("TableUuid", Uuid)
 
 
 class Task(BaseModel):
@@ -10,25 +13,29 @@ class Task(BaseModel):
     status: str
     notes: str = ""
 
+    table_uuid: TableUuid = ""
+
 
 class TaskResponse(Task):
-    uuid: Uuid
+    uuid: TaskUuid
 
 
 class Table(BaseModel):
     name: str
     tasks: list[TaskResponse] = []
 
+    group_uuid: GroupUuid = ""
+
 
 class TableResponse(Table):
-    uuid: Uuid
+    uuid: TableUuid
 
 
 class Group(BaseModel):
     name: str
     project: str
-    tables: list[TableResponse] = []
+    tables: list[TableUuid] = []
 
 
 class GroupResponse(Group):
-    uuid: Uuid
+    uuid: GroupUuid
