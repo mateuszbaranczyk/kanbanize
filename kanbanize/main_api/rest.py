@@ -3,11 +3,13 @@ from fastapi import APIRouter
 from kanbanize.main_api.schemas import (
     Group,
     GroupResponse,
+    GroupUuid,
     Table,
     TableResponse,
+    TableUuid,
     Task,
     TaskResponse,
-    Uuid,
+    TaskUuid,
 )
 
 table = APIRouter(prefix="/table", tags=["table"])
@@ -17,54 +19,44 @@ group = APIRouter(prefix="/group", tags=["group"])
 
 @table.post("/create")
 async def create_table(table: Table) -> TableResponse:
-    result = TableResponse(name=table.name, tasks=table.tasks, uuid="uuid123")
-    return result
+    return table
 
 
 @table.get("/get/{uuid}")
-async def get_table(uuid: Uuid) -> TableResponse:
-    t1 = TaskResponse(name="test1", status="done", notes="", uuid="uuid1")
-    t2 = TaskResponse(name="test2", status="done", notes="", uuid="uuid2")
-    result = TableResponse(name="table name", tasks=[t1, t2], uuid=uuid)
-    return result
+async def get_table(uuid: TableUuid) -> TableResponse:
+    return uuid
 
 
-@table.patch("/edit/{uuid}")
-async def edit_table(uuid: Uuid) -> Table:
-    pass
+@table.put("/edit/{uuid}")
+async def edit_table(uuid: TableUuid, table: Table) -> TableResponse:
+    return table
 
 
 @group.post("/create")
 async def create_group(group: Group) -> GroupResponse:
-    # Code to create a group goes here
-    pass
+    return group
 
 
 @group.get("/get/{uuid}")
-async def get_group(uuid: Uuid) -> GroupResponse:
-    # Code to get a group goes here
-    return "group"
+async def get_group(uuid: GroupUuid) -> GroupResponse:
+    return uuid
 
 
-@group.patch("/edit/{uuid}")
-async def edit_group(uuid: Uuid) -> GroupResponse:
-    pass
+@group.put("/edit/{uuid}")
+async def edit_group(uuid: GroupUuid, group: Group) -> GroupResponse:
+    return group
 
 
 @task.post("/create")
 async def create_task(task: Task) -> TaskResponse:
-    result = TaskResponse(
-        name=task.name, status=task.status, notes=task.notes, uuid="dfa21-2313"
-    )
-    return result
+    return task
 
 
 @task.get("/get/{uuid}")
-async def get_task(uuid: Uuid) -> TaskResponse:
-    result = TaskResponse(name="test", status="done", notes="", uuid=uuid)
-    return result
+async def get_task(uuid: TaskUuid) -> TaskResponse:
+    return uuid
 
 
-@task.patch("/edit/{uuid}")
-async def edit_task(uuid: Uuid) -> TaskResponse:
-    pass
+@task.put("/edit/{uuid}")
+async def edit_task(uuid: TaskUuid, task: Task) -> TaskResponse:
+    return task
