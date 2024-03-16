@@ -1,13 +1,13 @@
 from fastapi.testclient import TestClient
 
-from kanbanize.main_api.rest import group
+from kanbanize.main_api.run import app
 
-client_group = TestClient(group)
+client = TestClient(app)
 
 
 def test_create_group():
-    response = client_group.post(
-        "/create", json={"name": "test group", "project": "test project"}
+    response = client.post(
+        "/group/create", json={"name": "test group", "project": "test project"}
     )
     assert response.status_code == 200
     assert response.json()["name"] == "test group"
@@ -15,13 +15,14 @@ def test_create_group():
 
 
 def test_get_group():
-    response = client_group.get("/get/1")
+    response = client.get("/group/get/1")
     assert response.status_code == 200
 
 
 def test_edit_group():
-    response = client_group.put(
-        "/edit/1", json={"name": "edited group", "project": "edited project"}
+    response = client.put(
+        "/group/edit/1",
+        json={"name": "edited group", "project": "edited project"},
     )
     assert response.status_code == 200
     assert response.json()["name"] == "edited group"

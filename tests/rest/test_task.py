@@ -1,13 +1,13 @@
 from fastapi.testclient import TestClient
 
-from kanbanize.main_api.rest import task
+from kanbanize.main_api.run import app
 
-client = TestClient(task)
+client = TestClient(app)
 
 
 def test_create_task():
     response = client.post(
-        "/create", json={"name": "test task", "status": "todo"}
+        "/task/create", json={"name": "test task", "status": "todo"}
     )
     assert response.status_code == 200
     assert response.json()["name"] == "test task"
@@ -15,13 +15,13 @@ def test_create_task():
 
 
 def test_get_task():
-    response = client.get("/get/1")
+    response = client.get("/task/get/1")
     assert response.status_code == 200
 
 
 def test_edit_task():
     response = client.put(
-        "/edit/1", json={"name": "edited task", "status": "done"}
+        "/task/edit/1", json={"name": "edited task", "status": "done"}
     )
     assert response.status_code == 200
     assert response.json()["name"] == "edited task"
