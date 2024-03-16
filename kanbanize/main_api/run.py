@@ -3,14 +3,14 @@ from fastapi.responses import RedirectResponse
 
 from kanbanize.main_api.rest import group, table, task
 
-app = FastAPI()
+rest = FastAPI()
 
 
-app.include_router(table)
-app.include_router(task)
-app.include_router(group)
+rest.include_router(table)
+rest.include_router(task)
+rest.include_router(group)
 
 
-@app.get("/")
+@rest.get("/")
 async def read_root():
     return RedirectResponse("/docs/")
