@@ -12,8 +12,8 @@ from kanbanize.data_structures.schemas import (
     TaskUuid,
 )
 
-table = APIRouter(prefix="/table", tags=["table"])
 task = APIRouter(prefix="/task", tags=["task"])
+table = APIRouter(prefix="/table", tags=["table"])
 group = APIRouter(prefix="/group", tags=["group"])
 
 
