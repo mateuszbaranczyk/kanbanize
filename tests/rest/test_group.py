@@ -1,8 +1,8 @@
 from fastapi.testclient import TestClient
 
-from kanbanize.main_api.run import app
+from kanbanize.main_api.run import rest
 
-client = TestClient(app)
+client = TestClient(rest)
 
 
 def test_create_group():
