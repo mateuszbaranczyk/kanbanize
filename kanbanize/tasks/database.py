@@ -1,14 +1,21 @@
-import pyrebase
+import os
+import uuid
 
-config = {
-    "apiKey": "apiKey",
-    "authDomain": "projectId.firebaseapp.com",
-    "databaseURL": "https://databaseName.firebaseio.com",
-    "storageBucket": "projectId.appspot.com",
-}
+from google.cloud import firestore
 
-firebase = pyrebase.initialize_app(config)
-auth = firebase.auth()
-user = auth.sign_in_with_email_and_password("email", "password")
+from kanbanize.data_structures.schemas import TaskResponse
 
-db = firebase.database()
+project_id = os.getenv("PROJECT_ID")
+db = firestore.Client(project=project_id, database="kanbanize")
+
+
+uuid = str(uuid.uuid4())
+task_id = f"ta-{uuid}"
+task = TaskResponse(name="front", status="TODO", notes="test", uuid=task_id)
+task_dump = task.model_dump()
+
+doc_ref = db.collection("tasks").document(task_id)
+doc_ref.set(task_dump, timeout=500.0)
+
+
+# https://cloud.google.com/firestore/docs/manage-data/add-data
