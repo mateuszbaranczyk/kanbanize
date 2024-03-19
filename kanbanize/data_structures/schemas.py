@@ -1,4 +1,5 @@
 from typing import NewType
+from uuid import uuid4
 
 from pydantic import BaseModel
 
@@ -6,6 +7,11 @@ Uuid = NewType("Uuid", str)
 TaskUuid = NewType("TaskUuid", Uuid)
 GroupUuid = NewType("GroupUuid", Uuid)
 TableUuid = NewType("TableUuid", Uuid)
+
+
+def create_uuid(prefix: str) -> Uuid:
+    uuid = str(uuid4())
+    return f"{prefix}-{uuid}"
 
 
 class Task(BaseModel):
@@ -17,7 +23,7 @@ class Task(BaseModel):
 
 
 class TaskResponse(Task):
-    uuid: TaskUuid
+    uuid: TaskUuid = create_uuid("ta")
 
 
 class Table(BaseModel):
