@@ -3,6 +3,8 @@ from uuid import uuid4
 
 from pydantic import BaseModel
 
+TASK_PREFIX = "ta"
+
 Uuid = NewType("Uuid", str)
 TaskUuid = NewType("TaskUuid", Uuid)
 GroupUuid = NewType("GroupUuid", Uuid)
@@ -23,7 +25,7 @@ class Task(BaseModel):
 
 
 class TaskResponse(Task):
-    uuid: TaskUuid = create_uuid("ta")
+    uuid: TaskUuid = create_uuid(TASK_PREFIX)
 
 
 class Table(BaseModel):
