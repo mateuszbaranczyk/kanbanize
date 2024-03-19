@@ -1,21 +1,11 @@
 import os
-import uuid
 
 from google.cloud import firestore
 
-from kanbanize.data_structures.schemas import TaskResponse
+DB_TIMEOUT = 500.0
+TASKS_COLLECTION = "tasks"
 
 project_id = os.getenv("PROJECT_ID")
-db = firestore.Client(project=project_id, database="kanbanize")
+database_name = os.getenv("DB_NAME", "kanbanize")
 
-
-uuid = str(uuid.uuid4())
-task_id = f"ta-{uuid}"
-task = TaskResponse(name="front", status="TODO", notes="test", uuid=task_id)
-task_dump = task.model_dump()
-
-doc_ref = db.collection("tasks").document(task_id)
-doc_ref.set(task_dump, timeout=500.0)
-
-
-# https://cloud.google.com/firestore/docs/manage-data/add-data
+db = firestore.Client(project=project_id, database=database_name)
