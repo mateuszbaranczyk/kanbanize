@@ -5,12 +5,12 @@ from kanbanize.tasks.database import DB_TIMEOUT, TASKS_COLLECTION
 
 
 def create_task(db: firestore.Client, task: Task) -> TaskResponse:
-    data = TaskResponse(**task)
-    task_dump = data.model_dump()
+    db_object = TaskResponse(**task.model_dump())
+    task_dump = db_object.model_dump()
 
-    db_document = db.collection(TASKS_COLLECTION).document(data.uuid)
+    db_document = db.collection(TASKS_COLLECTION).document(db_object.uuid)
     db_document.set(task_dump, timeout=DB_TIMEOUT)
-    return data
+    return db_object
 
 
 # https://cloud.google.com/firestore/docs/manage-data/add-data
