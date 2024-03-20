@@ -1,6 +1,5 @@
-from unittest.mock import MagicMock
-
 from fastapi.testclient import TestClient
+from mockfirestore import MockFirestore
 from pytest import fixture
 
 from kanbanize.data_structures.schemas import Task
@@ -20,15 +19,21 @@ def dumped_task(task) -> dict:
 
 
 @fixture
-def client():
+def client() -> TestClient:
     client = TestClient(app)
     return client
 
 
-def mocked_db():
-    return MagicMock()
+# @fixture
+def mocked_db() -> MockFirestore:
+    mock_db = MockFirestore()
+    try:
+        yield mock_db
+    finally:
+        mock_db.reset()
 
 
 @fixture(autouse=True)
-def get_db_override():
+def override_get_db() -> None:
     app.dependency_overrides[get_db] = mocked_db
+    return None

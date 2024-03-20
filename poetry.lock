@@ -699,6 +699,17 @@ files = [
 ]
 
 [[package]]
+name = "mock-firestore"
+version = "0.11.0"
+description = "In-memory implementation of Google Cloud Firestore for use in tests"
+optional = false
+python-versions = "*"
+files = [
+    {file = "mock-firestore-0.11.0.tar.gz", hash = "sha256:4958b983534b890f7cdffe12b651b1deefa6ee202ee46af751c6bdaa44fe3432"},
+    {file = "mock_firestore-0.11.0-py3-none-any.whl", hash = "sha256:9e847a886a64d490bf13e2d52105745b6618d6a7e7169aeb62d4b895c405d204"},
+]
+
+[[package]]
 name = "mypy-extensions"
 version = "1.0.0"
 description = "Type system extensions for programs checked with the mypy type checker."
@@ -1237,4 +1248,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "5a5072677f0a892b3372206a6d1c5cd46bc419841701d10cb9ec120302eb7932"
+content-hash = "27027fea124ef37172ee021db4d27f1b8848ca76ff478659fe636574bb55ef87"

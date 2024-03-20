@@ -9,7 +9,7 @@ def create_task(db: firestore.Client, task: Task) -> TaskResponse:
     task_dump = db_object.model_dump()
 
     db_document = db.collection(TASKS_COLLECTION).document(db_object.uuid)
-    db_document.set(task_dump, timeout=DB_TIMEOUT)
+    db_document.set(data=task_dump, timeout=DB_TIMEOUT)
     return db_object
 
 
