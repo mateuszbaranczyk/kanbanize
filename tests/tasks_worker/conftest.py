@@ -24,7 +24,6 @@ def client() -> TestClient:
     return client
 
 
-# @fixture
 def mocked_db() -> MockFirestore:
     mock_db = MockFirestore()
     try:
