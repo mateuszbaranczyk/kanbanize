@@ -1,16 +1,7 @@
-from unittest.mock import patch
-
-from fastapi.testclient import TestClient
-
 from kanbanize.data_structures.schemas import TASK_PREFIX, TaskResponse
-from kanbanize.tasks.rest import app
-
-client = TestClient(app)
 
 
-@patch("kanbanize.tasks.rest.get_db")
-def test_create_task(db, task):
-    db.return_value = None
+def test_create_task(client, task):
     task_dump = task.model_dump_json()
     response = client.post("/task/create/", data=task_dump)
     task_response = TaskResponse(**response.json())
