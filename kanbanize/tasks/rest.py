@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, FastAPI
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from google.cloud import firestore
 
-from kanbanize.data_structures.schemas import Task, TaskResponse
+from kanbanize.data_structures.schemas import Task, TaskResponse, TaskUuid
 from kanbanize.tasks import crud
 from kanbanize.tasks.database import get_db
 from kanbanize.tasks.events import send_event
@@ -22,6 +22,17 @@ async def create_task(
 
     # TODO
     # save event to db?
+
+
+@task.get("/get/{uuid}")
+def get_task(
+    uuid: TaskUuid, db: firestore.Client = Depends(get_db)
+) -> TaskResponse:
+    try:
+        task = crud.get_task(db, uuid)
+        return task
+    except NameError:
+        raise HTTPException(404)
 
 
 app.include_router(task)
