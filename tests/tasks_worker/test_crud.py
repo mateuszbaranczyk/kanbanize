@@ -4,7 +4,7 @@ from kanbanize.data_structures.schemas import TASK_PREFIX, TaskResponse
 from kanbanize.tasks.crud import create_task
 
 
-@patch("kanbanize.tasks.database.db")
+@patch("kanbanize.tasks.database.get_db")
 def test_create_task(db, task):
     result = create_task(db, task)
     assert isinstance(result, TaskResponse)
