@@ -4,7 +4,7 @@ from kanbanize.data_structures.schemas import Task, TaskResponse, TaskUuid
 from kanbanize.tasks.database import DB_TIMEOUT, TASKS_COLLECTION
 
 
-def create_task(db: firestore.Client, task: Task) -> TaskResponse:
+def create(db: firestore.Client, task: Task) -> TaskResponse:
     db_object = TaskResponse(**task.model_dump())
     task_dump = db_object.model_dump()
 
@@ -13,7 +13,7 @@ def create_task(db: firestore.Client, task: Task) -> TaskResponse:
     return db_object
 
 
-def get_task(db: firestore.Client, uuid: TaskUuid) -> TaskResponse:
+def get(db: firestore.Client, uuid: TaskUuid) -> TaskResponse:
     db_document = db.collection(TASKS_COLLECTION).document(uuid)
     task = db_document.get()
     if task.exists:
@@ -22,4 +22,14 @@ def get_task(db: firestore.Client, uuid: TaskUuid) -> TaskResponse:
         raise NameError(f"No such document! {uuid}")
 
 
-# https://cloud.google.com/firestore/docs/manage-data/add-data
+def edit(db: firestore.Client, uuid: TaskUuid, data: dict) -> TaskResponse:
+    task = get(db, uuid)
+
+    task_data = task.model_dump()
+    for key, value in data.items():
+        if key in task_data:
+            task_data[key] = value
+
+    db_document = db.collection(TASKS_COLLECTION).document(uuid)
+    db_document.update(data=task_data, timeout=DB_TIMEOUT)
+    return TaskResponse(**task_data)
