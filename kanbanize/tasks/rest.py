@@ -35,4 +35,26 @@ def get(
         raise HTTPException(404)
 
 
+@task.put("/edit/{uuid}")
+def edit(
+    data: dict, uuid: TaskUuid, db: firestore.Client = Depends(get_db)
+) -> TaskResponse:
+    data = _validate_data(data)
+    table_uuid = data.get("table_uuid", None)
+
+    if table_uuid:
+        send_event()
+
+    return edit(db, uuid, data)
+
+
+def _validate_data(data):
+    for key, _ in data.items():
+        if hasattr(Task, key):
+            pass
+        else:
+            del data[key]
+    return data
+
+
 app.include_router(task)
