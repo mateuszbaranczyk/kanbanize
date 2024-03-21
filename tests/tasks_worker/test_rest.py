@@ -1,5 +1,7 @@
 from unittest.mock import patch
 
+from conftest import create_new_task
+
 from kanbanize.data_structures.schemas import TASK_PREFIX, TaskResponse
 
 
@@ -16,7 +18,7 @@ def test_create_task(client, task):
     assert task_response.uuid.startswith(TASK_PREFIX)
 
 
-@patch("kanbanize.tasks.crud.get_task")
+@patch("kanbanize.tasks.crud.get")
 def test_get_task(mock_crud, client, task):
     db_task = TaskResponse(**task.model_dump())
     mock_crud.return_value = db_task
@@ -27,7 +29,7 @@ def test_get_task(mock_crud, client, task):
     assert task_response.uuid == db_task.uuid
 
 
-@patch("kanbanize.tasks.crud.get_task")
+@patch("kanbanize.tasks.crud.get")
 def test_get_task_returns_404(
     mock_crud,
     client,
@@ -36,3 +38,12 @@ def test_get_task_returns_404(
 
     response = client.get("/task/get/uuid")
     assert response.status_code == 404
+
+
+# @patch("kanbanize.tasks.crud.get")
+def test_edit_task(mock_db, client, task):
+    new_task = create_new_task(mock_db, task)
+    data = {"name": "new_name"}
+    result = client.put(f"/task/edit/{new_task.uuid}", data=data)
+
+    assert result.status_code == 200
