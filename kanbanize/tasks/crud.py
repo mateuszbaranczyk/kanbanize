@@ -10,7 +10,10 @@ def create(db: firestore.Client, task: Task) -> TaskResponse:
 
     db_document = db.collection(TASKS_COLLECTION).document(db_object.uuid)
     db_document.set(data=task_dump, timeout=DB_TIMEOUT)
-    return db_object
+    created_document = (
+        db.collection(TASKS_COLLECTION).document(db_object.uuid).get()
+    )._doc
+    return TaskResponse(**created_document)
 
 
 def get(db: firestore.Client, uuid: TaskUuid) -> TaskResponse:
@@ -32,4 +35,7 @@ def edit(db: firestore.Client, uuid: TaskUuid, data: dict) -> TaskResponse:
 
     db_document = db.collection(TASKS_COLLECTION).document(uuid)
     db_document.update(data=task_data, timeout=DB_TIMEOUT)
-    return TaskResponse(**task_data)
+    edited_document = (
+        db.collection(TASKS_COLLECTION).document(uuid).get()
+    )._doc
+    return TaskResponse(**edited_document)
