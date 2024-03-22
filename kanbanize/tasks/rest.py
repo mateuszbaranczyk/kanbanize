@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from google.cloud import firestore
 
@@ -7,6 +5,7 @@ from kanbanize.data_structures.schemas import Task, TaskResponse, TaskUuid
 from kanbanize.tasks import crud
 from kanbanize.tasks.database import get_db
 from kanbanize.tasks.events import send_message
+from kanbanize.tasks.validation import validate
 
 app = FastAPI()
 
@@ -31,21 +30,6 @@ def get(
         return task
     except NameError:
         raise HTTPException(404)
-
-
-@dataclass
-class TaskDataValidator:
-    name: str = ""
-    status: str = ""
-    notes: str = ""
-    table_uuid: str = ""
-
-
-def validate(data):
-    try:
-        TaskDataValidator(**data)
-    except TypeError:
-        raise HTTPException(422)
 
 
 @task.put("/edit/{uuid}")
