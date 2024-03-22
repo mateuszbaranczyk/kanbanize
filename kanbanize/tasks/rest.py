@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from google.cloud import firestore
 
@@ -35,26 +37,25 @@ def get(
         raise HTTPException(404)
 
 
+@dataclass
+class TaskDataValidator:
+    name: str = ""
+    status: str = ""
+    notes: str = ""
+    table_uuid: str = ""
+
+
 @task.put("/edit/{uuid}")
 def edit(
     data: dict, uuid: TaskUuid, db: firestore.Client = Depends(get_db)
 ) -> TaskResponse:
-    data = _validate_data(data)
+    TaskDataValidator(**data)
     table_uuid = data.get("table_uuid", None)
 
     if table_uuid:
         send_event()
 
-    return edit(db, uuid, data)
-
-
-def _validate_data(data):
-    for key, _ in data.items():
-        if hasattr(Task, key):
-            pass
-        else:
-            del data[key]
-    return data
+    return crud.edit(db, uuid, data)
 
 
 app.include_router(task)
