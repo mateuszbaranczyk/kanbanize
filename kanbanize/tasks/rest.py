@@ -6,7 +6,7 @@ from google.cloud import firestore
 from kanbanize.data_structures.schemas import Task, TaskResponse, TaskUuid
 from kanbanize.tasks import crud
 from kanbanize.tasks.database import get_db
-from kanbanize.tasks.events import send_event
+from kanbanize.tasks.events import send_message
 
 app = FastAPI()
 
@@ -18,12 +18,8 @@ async def create(
     task: Task, db: firestore.Client = Depends(get_db)
 ) -> TaskResponse:
     result = crud.create(db, task)
-    if result.table_uuid:
-        send_event()
+    send_message(task, task.table_uuid)
     return result
-
-    # TODO
-    # save event to db?
 
 
 @task.get("/get/{uuid}")
@@ -50,11 +46,6 @@ def validate(data):
         TaskDataValidator(**data)
     except TypeError:
         raise HTTPException(422)
-
-
-def send_message(task, table_uuid):
-    if table_uuid:
-        send_event(task)
 
 
 @task.put("/edit/{uuid}")
