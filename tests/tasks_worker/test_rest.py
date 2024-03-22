@@ -33,10 +33,23 @@ def test_get_task_returns_404(client):
 
 def test_edit_task(mock_db, client, task):
     new_task = create_new_task(mock_db, task)
-    data = {"name": "new name"}
+    new_name = "test name 2"
+    data = {"name": new_name}
 
     result = client.put(f"/task/edit/{new_task.uuid}", json=data)
     task_response = TaskResponse(**result.json())
 
     assert result.status_code == 200
-    assert task_response.name == "new_name"
+    assert task_response.name == new_name
+
+
+def test_nonexisted_edit_task(client):
+    result = client.put("/task/edit/uuid", json={})
+
+    assert result.status_code == 404
+
+
+def test_send_edit_task_with_invalid_data(client):
+    result = client.put("/task/edit/uuid", json={"test": "test"})
+
+    assert result.status_code == 422
