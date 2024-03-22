@@ -3,5 +3,5 @@
 # save event in db?
 
 
-def send_event():
+def send_event(task):
     pass

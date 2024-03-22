@@ -45,17 +45,31 @@ class TaskDataValidator:
     table_uuid: str = ""
 
 
+def validate(data):
+    try:
+        TaskDataValidator(**data)
+    except TypeError:
+        raise HTTPException(422)
+
+
+def send_message(task, table_uuid):
+    if table_uuid:
+        send_event(task)
+
+
 @task.put("/edit/{uuid}")
 def edit(
     data: dict, uuid: TaskUuid, db: firestore.Client = Depends(get_db)
 ) -> TaskResponse:
-    TaskDataValidator(**data)
+    validate(data)
     table_uuid = data.get("table_uuid", None)
 
-    if table_uuid:
-        send_event()
-
-    return crud.edit(db, uuid, data)
+    try:
+        task = crud.edit(db, uuid, data)
+        send_message(task, table_uuid)
+        return task
+    except NameError:
+        raise HTTPException(404)
 
 
 app.include_router(task)
