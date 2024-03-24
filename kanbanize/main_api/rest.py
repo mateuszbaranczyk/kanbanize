@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from kanbanize.data_structures.schemas import (
+from kanbanize.schemas import (
     Group,
     GroupResponse,
     GroupUuid,

@@ -1,6 +1,6 @@
 from google.cloud import firestore
 
-from kanbanize.data_structures.schemas import Task, TaskResponse, TaskUuid
+from kanbanize.schemas import Task, TaskResponse, TaskUuid
 from kanbanize.tasks.database import COLLECTION, DB_TIMEOUT
 
 

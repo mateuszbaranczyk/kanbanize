@@ -1,8 +1,8 @@
 import os
 from abc import ABC, abstractmethod
 
-from kanbanize.data_structures import Task
 from kanbanize.rabbit_sender import RmqSender
+from kanbanize.schemas import Task
 
 
 class TaskEvent(RmqSender, ABC):

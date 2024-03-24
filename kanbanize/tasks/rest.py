@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from google.cloud import firestore
 
-from kanbanize.data_structures.schemas import Task, TaskResponse, TaskUuid
+from kanbanize.schemas import Task, TaskResponse, TaskUuid
 from kanbanize.tasks import crud
 from kanbanize.tasks.database import get_db
 from kanbanize.tasks.events import TaskConnectedEvent, TaskDisconnectedEvent
-from kanbanize.tasks.validation import validate
+from kanbanize.validation import validate
 
 app = FastAPI()
 

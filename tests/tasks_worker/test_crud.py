@@ -1,7 +1,7 @@
 from conftest import create_new_task
 from pytest import raises
 
-from kanbanize.data_structures.schemas import TASK_PREFIX, TaskResponse
+from kanbanize.schemas import TASK_PREFIX, TaskResponse
 from kanbanize.tasks.crud import create, edit, get
 
 

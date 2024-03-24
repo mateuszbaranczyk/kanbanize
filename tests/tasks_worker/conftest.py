@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from mockfirestore import MockFirestore
 from pytest import fixture
 
-from kanbanize.data_structures.schemas import Task, TaskResponse
+from kanbanize.schemas import Task, TaskResponse
 from kanbanize.tasks.database import get_db
 from kanbanize.tasks.rest import app
 

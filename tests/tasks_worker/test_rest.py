@@ -1,6 +1,6 @@
 from conftest import create_new_task
 
-from kanbanize.data_structures.schemas import TASK_PREFIX, TaskResponse
+from kanbanize.schemas import TASK_PREFIX, TaskResponse
 
 
 def test_create_task(client, task):
