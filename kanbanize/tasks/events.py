@@ -1,29 +1,65 @@
 import os
+from abc import ABC, abstractmethod
 
 import pika
-from pika.adapters.blocking_connection import BlockingChannel
 
 from kanbanize.data_structures import Task
 
-HOST = os.getenv("RMQ_HOST", "localhost")
-QUEUE = "tasks"
-EXCHANGE = ""
+
+class RmqSender:
+    host = os.getenv("RMQ_HOST", "localhost")
+    queue = os.getenv("QUEUE", "tasks")
+    exchange = os.getenv("EXCHANGE", "")
+    routing_key = os.getenv("ROUTING_KEY", "tasks")
+
+    def __init__(self) -> None:
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=self.host)
+        )
+        self.channel = self.connection.channel()
+        self.channel.queue_declare(queue=self.queue)
+
+    def send_message(self, body: str, close_connection: bool = True) -> None:
+        self.channel.basic_publish(
+            exchange=self.exchange,
+            routing_key=self.routing_key,
+            body=body,
+            properties=pika.BasicProperties(
+                delivery_mode=pika.DeliveryMode.Persistent
+            ),
+        )
+        if close_connection:
+            self.connection.close()
 
 
-def create_chanel() -> BlockingChannel:
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST))
-    channel = connection.channel()
-    channel.queue_declare(queue=QUEUE)
+class TaskEvent(RmqSender, ABC):
+    def __init__(self, task: Task) -> None:
+        super().__init__()
+        self.task = task
+
+    def send(self) -> None:
+        body = self.create_body_message(self.task)
+        self.send_message(body)
+
+    @abstractmethod
+    def create_body_message(self, task: Task) -> str:
+        raise NotImplementedError
 
 
-def create_body_message(task: Task) -> str:
-    return f"::TASK connected to TABLE:: {task.uuid} -> {task.table_uuid}"
+class TaskConnectedEvent(TaskEvent):
+    def __init__(self, task: Task) -> None:
+        super().__init__(task)
+
+    def create_body_message(self, task: Task) -> str:
+        return f"::TASK connected to TABLE:: {task.uuid} -> {task.table_uuid}"
 
 
-def send_message(task: Task, table_uuid: str | None) -> None:
-    if table_uuid:
-        channel = create_chanel()
-        body = create_body_message(task)
-        channel.basic_publish(
-            exchange=EXCHANGE, routing_key="hello", body=body
+class TaskDisconnectedEvent(TaskEvent):
+    def __init__(self, task: Task) -> None:
+        super().__init__(task)
+
+    def create_body_message(self, task: Task) -> str:
+        return (
+            f"::TASK disconnected from TABLE:: {task.uuid} "
+            f"from {task.table_uuid}"
         )
