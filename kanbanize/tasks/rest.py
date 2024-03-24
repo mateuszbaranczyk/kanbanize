@@ -4,7 +4,7 @@ from google.cloud import firestore
 from kanbanize.data_structures.schemas import Task, TaskResponse, TaskUuid
 from kanbanize.tasks import crud
 from kanbanize.tasks.database import get_db
-from kanbanize.tasks.events import send_message
+from kanbanize.tasks.events import TaskConnectedEvent, TaskDisconnectedEvent
 from kanbanize.tasks.validation import validate
 
 app = FastAPI()
@@ -17,7 +17,8 @@ async def create(
     task: Task, db: firestore.Client = Depends(get_db)
 ) -> TaskResponse:
     result = crud.create(db, task)
-    send_message(task, task.table_uuid)
+    if task.table_uuid:
+        TaskConnectedEvent(task).send()
     return result
 
 
@@ -37,14 +38,24 @@ def edit(
     data: dict, uuid: TaskUuid, db: firestore.Client = Depends(get_db)
 ) -> TaskResponse:
     validate(data)
-    table_uuid = data.get("table_uuid", None)
-
     try:
         task = crud.edit(db, uuid, data)
-        send_message(task, table_uuid)
-        return task
     except NameError:
         raise HTTPException(404)
+    handle_events(data, task)
+    return task
+
+
+def handle_events(data: dict, task: Task) -> None:
+    table_uuid = data.get("table_uuid", "Key unavaliable")
+    match table_uuid:
+        case "Key unavaliable":
+            pass
+        case "":
+            TaskDisconnectedEvent(task).send()
+        case r"ta-*":
+            TaskConnectedEvent(task).send()
+    return None
 
 
 app.include_router(task)
