@@ -28,9 +28,9 @@ def get(
 ) -> TaskResponse:
     try:
         task = crud.get(db, uuid)
-        return task
     except NameError:
         raise HTTPException(404)
+    return task
 
 
 @task.put("/edit/{uuid}")
