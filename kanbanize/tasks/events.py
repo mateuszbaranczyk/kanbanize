@@ -1,38 +1,16 @@
 import os
 from abc import ABC, abstractmethod
 
-import pika
-
 from kanbanize.data_structures import Task
+from kanbanize.rabbit_sender import RmqSender
 
 
-class RmqSender:
+class TaskEvent(RmqSender, ABC):
     host = os.getenv("RMQ_HOST", "localhost")
     queue = os.getenv("QUEUE", "tasks")
     exchange = os.getenv("EXCHANGE", "")
     routing_key = os.getenv("ROUTING_KEY", "tasks")
 
-    def __init__(self) -> None:
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=self.host)
-        )
-        self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.queue)
-
-    def send_message(self, body: str, close_connection: bool = True) -> None:
-        self.channel.basic_publish(
-            exchange=self.exchange,
-            routing_key=self.routing_key,
-            body=body,
-            properties=pika.BasicProperties(
-                delivery_mode=pika.DeliveryMode.Persistent
-            ),
-        )
-        if close_connection:
-            self.connection.close()
-
-
-class TaskEvent(RmqSender, ABC):
     def __init__(self, task: Task) -> None:
         super().__init__()
         self.task = task
