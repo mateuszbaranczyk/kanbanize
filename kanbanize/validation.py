@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from fastapi import HTTPException
 
 
-@dataclass
+@dataclass(frozen=True)
 class TaskDataValidator:
     name: str = ""
     status: str = ""
@@ -11,8 +11,8 @@ class TaskDataValidator:
     table_uuid: str = ""
 
 
-def validate(data: dict) -> None:
+def validate(data: dict, validator: TaskDataValidator | None) -> None:
     try:
-        TaskDataValidator(**data)
+        validator(**data)
     except TypeError:
         raise HTTPException(422)
