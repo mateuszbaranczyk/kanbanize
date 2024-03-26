@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from fastapi.testclient import TestClient
 from mockfirestore import MockFirestore
 from pytest import fixture
@@ -69,3 +71,17 @@ def create_new_task(mock_db, task) -> TaskResponse:
         new_task.model_dump()
     )
     return new_task
+
+
+@fixture(autouse=True)
+def task_connected():
+    with patch("kanbanize.tasks.rest.TaskConnectedEvent") as connected_event:
+        yield connected_event
+
+
+@fixture(autouse=True)
+def task_disconnected():
+    with patch(
+        "kanbanize.tasks.rest.TaskDisconnectedEvent"
+    ) as disconnected_event:
+        yield disconnected_event
