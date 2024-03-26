@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 from conftest import create_new_task
 
@@ -17,13 +19,19 @@ def test_create_task(client, task):
     assert task_response.uuid.startswith(TASK_PREFIX)
 
 
-def test_create_task_with_connected_table(client, task, task_connected):
+@pytest.fixture
+def creation_event():
+    with patch("kanbanize.tasks.rest.TaskConnectedEvent") as connected_event:
+        yield connected_event
+
+
+def test_create_task_with_connected_table(client, task, creation_event):
     task.table_uuid = "tb-test"
     task_dump = task.model_dump_json()
 
     response = client.post("/task/create/", data=task_dump)
 
-    task_connected.assert_called_once_with(task)
+    creation_event.assert_called_once_with(task)
     assert response.status_code == 200
 
 
@@ -70,7 +78,9 @@ def test_edit_task_error_codes(client, error_code, json):
         ("", "task_disconnected"),
     ],
 )
-def test_edit_table(mock_db, client, task, table_uuid, task_event, request):
+def test_edit_with_events(
+    mock_db, client, task, table_uuid, task_event, request
+):
     new_task = create_new_task(mock_db, task)
     data = {"table_uuid": table_uuid}
 

@@ -75,13 +75,13 @@ def create_new_task(mock_db, task) -> TaskResponse:
 
 @fixture(autouse=True)
 def task_connected():
-    with patch("kanbanize.tasks.rest.TaskConnectedEvent") as connected_event:
+    with patch("kanbanize.tasks.events.TaskConnectedEvent") as connected_event:
         yield connected_event
 
 
 @fixture(autouse=True)
 def task_disconnected():
     with patch(
-        "kanbanize.tasks.rest.TaskDisconnectedEvent"
+        "kanbanize.tasks.events.TaskDisconnectedEvent"
     ) as disconnected_event:
         yield disconnected_event

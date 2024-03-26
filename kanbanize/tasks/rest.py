@@ -4,7 +4,11 @@ from google.cloud import firestore
 from kanbanize.schemas import Task, TaskResponse, TaskUuid
 from kanbanize.tasks import crud
 from kanbanize.tasks.database import get_db
-from kanbanize.tasks.events import TaskConnectedEvent, handle_events
+from kanbanize.tasks.events import (  # noqa: F401
+    TaskConnectedEvent,
+    TaskDisconnectedEvent,
+    handle_events,
+)
 from kanbanize.validation import validate
 
 app = FastAPI()
