@@ -2,7 +2,7 @@ import os
 from abc import ABC, abstractmethod
 
 from kanbanize.rabbit_sender import RmqSender
-from kanbanize.schemas import Task
+from kanbanize.schemas import TABLE_PREFIX, Task
 
 
 class TaskEvent(RmqSender, ABC):
@@ -41,3 +41,12 @@ class TaskDisconnectedEvent(TaskEvent):
             f"::TASK disconnected from TABLE:: {task.uuid} "
             f"from {task.table_uuid}"
         )
+
+
+def handle_events(data: dict, task: Task) -> None:
+    table_uuid = data.get("table_uuid", "No table uuid")
+    if table_uuid.startswith(TABLE_PREFIX):
+        TaskConnectedEvent(task).send()
+    elif table_uuid == "":
+        TaskDisconnectedEvent(task).send()
+    return None
