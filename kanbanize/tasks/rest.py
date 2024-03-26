@@ -22,7 +22,7 @@ async def create(
 ) -> TaskResponse:
     result = crud.create(db, task)
     if task.table_uuid:
-        TaskConnectedEvent(task).send()
+        TaskConnectedEvent(result).send()
     return result
 
 

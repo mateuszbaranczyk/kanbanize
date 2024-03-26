@@ -14,10 +14,10 @@ def create(db: firestore.Client, task: Task) -> TaskResponse:
 
 def _save_and_get(db, db_object, task_dump):
     db_document = db.collection(COLLECTION).document(db_object.uuid)
-    db_document.set(data=task_dump, timeout=DB_TIMEOUT)
+    db_document.set(task_dump, timeout=DB_TIMEOUT)
     created_document = (
         db.collection(COLLECTION).document(db_object.uuid).get()
-    )._doc
+    ).to_dict()
 
     return created_document
 
@@ -27,7 +27,7 @@ def get(db: firestore.Client, uuid: TaskUuid) -> TaskResponse:
     task = db_document.get()
 
     if task.exists:
-        return TaskResponse(**task._doc)
+        return TaskResponse(**task.to_dict())
     else:
         raise NameError(f"No such document! {uuid}")
 
@@ -46,7 +46,9 @@ def edit(db: firestore.Client, uuid: TaskUuid, data: dict) -> TaskResponse:
 
 def _edit_and_get(db, uuid, task_data):
     db_document = db.collection(COLLECTION).document(uuid)
-    db_document.update(data=task_data, timeout=DB_TIMEOUT)
-    edited_document = (db.collection(COLLECTION).document(uuid).get())._doc
+    db_document.update(task_data, timeout=DB_TIMEOUT)
+    edited_document = (
+        db.collection(COLLECTION).document(uuid).get()
+    ).to_dict()
 
     return edited_document

@@ -11,7 +11,9 @@ class TaskDataValidator:
     table_uuid: str = ""
 
 
-def validate(data: dict, validator: TaskDataValidator | None) -> None:
+def validate(
+    data: dict, validator: TaskDataValidator | None = TaskDataValidator
+) -> None:
     try:
         validator(**data)
     except TypeError:

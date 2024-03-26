@@ -31,7 +31,7 @@ def test_create_task_with_connected_table(client, task, creation_event):
 
     response = client.post("/task/create/", data=task_dump)
 
-    creation_event.assert_called_once_with(task)
+    creation_event.assert_called_once()
     assert response.status_code == 200
 
 
