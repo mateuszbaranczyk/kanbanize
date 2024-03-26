@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from google.cloud import firestore
 
-from kanbanize.schemas import Task, TaskResponse, TaskUuid
+from kanbanize.schemas import TABLE_PREFIX, Task, TaskResponse, TaskUuid
 from kanbanize.tasks import crud
 from kanbanize.tasks.database import get_db
 from kanbanize.tasks.events import TaskConnectedEvent, TaskDisconnectedEvent
@@ -47,14 +47,11 @@ def edit(
 
 
 def handle_events(data: dict, task: Task) -> None:
-    table_uuid = data.get("table_uuid", "Key unavaliable")
-    match table_uuid:
-        case "Key unavaliable":
-            pass
-        case "":
-            TaskDisconnectedEvent(task).send()
-        case r"ta-*":
-            TaskConnectedEvent(task).send()
+    table_uuid = data.get("table_uuid", "No table uuid")
+    if table_uuid.startswith(TABLE_PREFIX):
+        TaskConnectedEvent(task).send()
+    elif table_uuid == "":
+        TaskDisconnectedEvent(task).send()
     return None
 
 
