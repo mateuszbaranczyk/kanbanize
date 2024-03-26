@@ -4,6 +4,7 @@ from uuid import uuid4
 from pydantic import BaseModel
 
 TASK_PREFIX = "ta"
+TABLE_PREFIX = "tb"
 
 Uuid = NewType("Uuid", str)
 TaskUuid = NewType("TaskUuid", Uuid)
