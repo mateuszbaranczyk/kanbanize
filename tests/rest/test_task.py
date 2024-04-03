@@ -24,20 +24,24 @@ def test_get_task(request):
     assert response.json()["name"] == task.name
 
 
-@patch("kanbanize.main_api.adapters.TaskAdapter.create")
+@patch("kanbanize.main_api.adapters.TaskAdapter.edit")
 def test_edit_task(request):
-    task = _prepare_adapter_data(request)
+    task, expected = _prepare_adapter_data(
+        request, {"name": "edited task", "status": "done"}
+    )
     response = client.put(
         f"/task/edit/{task.uuid}",
-        json={"name": "edited task", "status": "done"},
+        json=expected,
     )
     assert response.status_code == 200
-    assert response.json()["name"] == "edited task"
-    assert response.json()["status"] == "done"
+    assert response.json()["name"] == expected["name"]
+    assert response.json()["status"] == expected["status"]
 
 
-def _prepare_adapter_data(request):
-    expected = {"name": "test task", "status": "todo"}
+def _prepare_adapter_data(
+    request, expected={"name": "test task", "status": "todo"}
+):
+    expected = expected
     task = TaskResponse(**expected)
     request.return_value = task
     return task, expected
