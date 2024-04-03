@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from kanbanize.main_api.adapters import TaskAdapter
 from kanbanize.schemas import (
     Group,
     GroupResponse,
@@ -49,7 +50,9 @@ async def edit_group(uuid: GroupUuid, group: Group) -> GroupResponse:
 
 @task.post("/create")
 async def create_task(task: Task) -> TaskResponse:
-    return task
+    adapter = TaskAdapter()
+    task_response = adapter.create(task.model_dump_json())
+    return task_response
 
 
 @task.get("/get/{uuid}")
