@@ -1,28 +1,47 @@
+from unittest.mock import patch
+
 from fastapi.testclient import TestClient
 
 from kanbanize.main_api.run import rest
+from kanbanize.schemas import TaskResponse
 
 client = TestClient(rest)
 
 
-def test_create_task():
-    response = client.post(
-        "/task/create", json={"name": "test task", "status": "todo"}
+@patch("kanbanize.main_api.adapters.TaskAdapter.create")
+def test_create_task(request):
+    task, expected = _prepare_adapter_data(request)
+    response = client.post("/task/create", json=expected)
+    assert response.status_code == 200
+    assert response.json()["name"] == task.name
+
+
+@patch("kanbanize.main_api.adapters.TaskAdapter.get")
+def test_get_task(request):
+    task, _ = _prepare_adapter_data(request)
+    response = client.get(f"/task/get/{task.uuid}")
+    assert response.status_code == 200
+    assert response.json()["name"] == task.name
+
+
+@patch("kanbanize.main_api.adapters.TaskAdapter.edit")
+def test_edit_task(request):
+    task, expected = _prepare_adapter_data(
+        request, {"name": "edited task", "status": "done"}
     )
-    assert response.status_code == 200
-    assert response.json()["name"] == "test task"
-    assert response.json()["status"] == "todo"
-
-
-def test_get_task():
-    response = client.get("/task/get/1")
-    assert response.status_code == 200
-
-
-def test_edit_task():
     response = client.put(
-        "/task/edit/1", json={"name": "edited task", "status": "done"}
+        f"/task/edit/{task.uuid}",
+        json=expected,
     )
     assert response.status_code == 200
-    assert response.json()["name"] == "edited task"
-    assert response.json()["status"] == "done"
+    assert response.json()["name"] == expected["name"]
+    assert response.json()["status"] == expected["status"]
+
+
+def _prepare_adapter_data(
+    request, expected={"name": "test task", "status": "todo"}
+):
+    expected = expected
+    task = TaskResponse(**expected)
+    request.return_value = task
+    return task, expected

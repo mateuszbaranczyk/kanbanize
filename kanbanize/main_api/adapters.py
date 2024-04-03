@@ -1,8 +1,9 @@
+import os
 from abc import ABC, abstractmethod
 
 from requests import request
 
-from kanbanize.data_structures.schemas import (
+from kanbanize.schemas import (
     Group,
     GroupResponse,
     GroupUuid,
@@ -19,43 +20,45 @@ from kanbanize.data_structures.schemas import (
 class IAdapter(ABC):
     location: str
 
-    @abstractmethod
-    def path(self, endpoint: str):
+    def path(self, endpoint: str) -> str:
         path = f"http://{self.location}/{endpoint}"
         return path
 
     @abstractmethod
-    def create(self, object_: dict, endpoint="create"):
+    def create(self, object_: dict, endpoint="create") -> dict:
         path = self.path(endpoint)
-        result = request.post(path, object_)
-        return result
+        result = request("POST", url=path, data=str(object_))
+        return result.json()
 
     @abstractmethod
-    def get(self, uuid: Uuid, endpoint="get"):
+    def get(self, uuid: Uuid, endpoint="get") -> dict:
         path = self.path(endpoint)
         url = f"{path}/{uuid}/"
-        result = request.get(url)
-        return result
+        result = request("GET", url=url)
+        return result.json()
 
     @abstractmethod
-    def edit(self, uuid: Uuid, object_: dict, endpoint="edit"):
+    def edit(self, uuid: Uuid, object_: dict, endpoint="edit") -> dict:
         path = self.path(endpoint)
         url = f"{path}/{endpoint}/{uuid}"
-        result = request.patch(url, object_)
-        return result
+        result = request("PUT", url=url, data=str(object_))
+        return result.json()
 
 
 class TaskAdapter(IAdapter):
-    location = "localhost"
+    location = os.getenv("ADAPTER_LOCATION", "localhost:2020/task")
 
     def create(self, object_: Task.dict) -> TaskResponse:
-        return super().create(object_)
+        response = super().create(object_)
+        return TaskResponse(**response)
 
     def get(self, uuid: TaskUuid) -> TaskResponse:
-        return super().get(uuid)
+        response = super().get(uuid)
+        return TaskResponse(**response)
 
     def edit(self, uuid: TaskUuid, object_: Task.dict) -> TaskResponse:
-        return super().edit(uuid, object_)
+        response = super().edit(uuid, object_)
+        return TaskResponse(**response)
 
 
 class GroupAdapter(IAdapter):
