@@ -27,7 +27,7 @@ async def create(
 
 
 @task.get("/get/{uuid}")
-def get(
+async def get(
     uuid: TaskUuid, db: firestore.Client = Depends(get_db)
 ) -> TaskResponse:
     try:
@@ -38,7 +38,7 @@ def get(
 
 
 @task.put("/edit/{uuid}")
-def edit(
+async def edit(
     data: dict, uuid: TaskUuid, db: firestore.Client = Depends(get_db)
 ) -> TaskResponse:
     validate(data)
