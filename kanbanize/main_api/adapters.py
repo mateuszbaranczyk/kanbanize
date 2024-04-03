@@ -34,8 +34,8 @@ class IAdapter(ABC):
     def get(self, uuid: Uuid, endpoint="get") -> dict:
         path = self.path(endpoint)
         url = f"{path}/{uuid}/"
-        result = request.get(url)
-        return result.json
+        result = request("GET", url=url)
+        return result.json()
 
     @abstractmethod
     def edit(self, uuid: Uuid, object_: dict, endpoint="edit") -> dict:
