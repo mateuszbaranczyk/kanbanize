@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 
 from requests import request
@@ -40,12 +41,12 @@ class IAdapter(ABC):
     def edit(self, uuid: Uuid, object_: dict, endpoint="edit") -> dict:
         path = self.path(endpoint)
         url = f"{path}/{endpoint}/{uuid}"
-        result = request.patch(url, object_)
+        result = request("PUT", url=url, data=str(object_))
         return result.json()
 
 
 class TaskAdapter(IAdapter):
-    location = "localhost:2020/task"
+    location = os.getenv("ADAPTER_LOCATION", "localhost:2020/task")
 
     def create(self, object_: Task.dict) -> TaskResponse:
         response = super().create(object_)
