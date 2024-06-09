@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 
-from kanbanize.main_api.rest import group, table, task
+from kanbanize.main_api.rest.rest import group, table, task
 
 rest = FastAPI()
 
