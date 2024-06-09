@@ -1,11 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from kanbanize.main_api.adapters import TaskAdapter
-from kanbanize.schemas import (
-    Task,
-    TaskResponse,
-    TaskUuid,
-)
+from kanbanize.schemas import Task, TaskResponse, TaskUuid
 
 task = APIRouter(prefix="/task", tags=["task"])
 

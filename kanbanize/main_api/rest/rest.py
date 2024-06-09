@@ -41,6 +41,3 @@ async def get_group(uuid: GroupUuid) -> GroupResponse:
 @group.put("/edit/{uuid}")
 async def edit_group(uuid: GroupUuid, group: Group) -> GroupResponse:
     return group
-
-
-
