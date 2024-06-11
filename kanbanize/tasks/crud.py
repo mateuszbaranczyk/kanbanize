@@ -5,11 +5,20 @@ from kanbanize.schemas import Task, TaskResponse, TaskUuid
 from kanbanize.tasks import database
 
 
-class TasksCRUD(FirestoreAdapter):
+class TasksAdapter(FirestoreAdapter):
     db = database.get_db()
     model = Task
     response_model = TaskResponse
     COLLECTION = database.COLLECTION
+
+    def get(self, uuid: TaskUuid) -> TaskResponse:
+        return super().get(uuid)
+
+    def create(self, data: Task) -> TaskResponse:
+        return super().create(new_object=data)
+
+    def edit(self, uuid: TaskUuid, data: dict) -> TaskResponse:
+        return super().edit(uuid, data)
 
 
 def create(db: firestore.Client, task: Task) -> TaskResponse:
@@ -30,26 +39,8 @@ def _save_and_get(db, db_object: TaskResponse, task_dump: dict) -> dict:
     return created_document
 
 
-def get(db: firestore.Client, uuid: TaskUuid) -> TaskResponse:
-    db_document = db.collection(database.COLLECTION).document(uuid)
-    task = db_document.get()
-
-    if task.exists:
-        return TaskResponse(**task.to_dict())
-    else:
-        raise NameError(f"No such document! {uuid}")
-
-
 def edit(db: firestore.Client, uuid: TaskUuid, data: dict) -> TaskResponse:
-    task = get(db, uuid)
-    task_data = task.model_dump()
-
-    for key, value in data.items():
-        if key in task_data:
-            task_data[key] = value
-
-    edited_document = _edit_and_get(db, uuid, task_data)
-    return TaskResponse(**edited_document)
+    pass
 
 
 def _edit_and_get(db, uuid: TaskUuid, task_data: dict) -> dict:
