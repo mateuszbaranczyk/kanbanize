@@ -1,8 +1,10 @@
-from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
+from google.cloud import firestore
 
 from kanbanize.firestore_adapter import DocumentError
 from kanbanize.schemas import Task, TaskResponse, TaskUuid
 from kanbanize.tasks import crud
+from kanbanize.tasks.database import get_db
 from kanbanize.tasks.events import (  # noqa: F401
     TaskConnectedEvent,
     TaskDisconnectedEvent,
@@ -16,8 +18,10 @@ task = APIRouter(prefix="/task")
 
 
 @task.post("/create")
-async def create(task: Task) -> TaskResponse:
-    adapter = crud.TasksAdapter()
+async def create(
+    task: Task, db: firestore.Client = Depends(get_db)
+) -> TaskResponse:
+    adapter = crud.TasksAdapter(db)
     try:
         result = adapter.create(data=task)
     except DocumentError:
@@ -29,8 +33,10 @@ async def create(task: Task) -> TaskResponse:
 
 
 @task.get("/get/{uuid}")
-async def get(uuid: TaskUuid) -> TaskResponse:
-    adapter = crud.TasksAdapter()
+async def get(
+    uuid: TaskUuid, db: firestore.Client = Depends(get_db)
+) -> TaskResponse:
+    adapter = crud.TasksAdapter(db)
     try:
         task = adapter.get(uuid)
     except NameError:
@@ -39,15 +45,17 @@ async def get(uuid: TaskUuid) -> TaskResponse:
 
 
 @task.put("/edit/{uuid}")
-async def edit(data: dict, uuid: TaskUuid) -> TaskResponse:
+async def edit(
+    data: dict, uuid: TaskUuid, db: firestore.Client = Depends(get_db)
+) -> TaskResponse:
     validate(data)
-    adapter = crud.TasksAdapter()
+    adapter = crud.TasksAdapter(db)
     try:
         result = adapter.edit(uuid, data)
     except NameError:
         raise HTTPException(404)
     handle_events(data, result)
-    return task
+    return result
 
 
 app.include_router(task)
