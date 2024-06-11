@@ -3,7 +3,8 @@ from typing import Any, Dict, Type
 
 import pydantic
 from google.cloud import firestore
-from schemas import Uuid
+
+from kanbanize.schemas import Uuid
 
 
 class Model(ABC, pydantic.BaseModel):
