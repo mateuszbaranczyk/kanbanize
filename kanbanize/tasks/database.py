@@ -5,7 +5,7 @@ from google.cloud import firestore
 DB_TIMEOUT = 500.0
 COLLECTION = "tasks"
 
-project_id = os.getenv("PROJECT_ID")
+project_id = os.getenv("FIRESTORE_PROJECT_ID", "dummy-firestore-id")
 database_name = os.getenv("DB_NAME", "kanbanize")
 
 
