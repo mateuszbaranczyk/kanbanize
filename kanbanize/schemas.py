@@ -33,8 +33,6 @@ class Table(BaseModel):
     name: str
     tasks: list[TaskResponse] = []
 
-    group_uuid: GroupUuid = ""
-
 
 class TableResponse(Table):
     uuid: TableUuid
