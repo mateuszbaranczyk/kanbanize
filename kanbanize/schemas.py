@@ -35,7 +35,7 @@ class Table(BaseModel):
 
 
 class TableResponse(Table):
-    uuid: TableUuid
+    uuid: TableUuid = create_uuid(TABLE_PREFIX)
 
 
 class Group(BaseModel):
