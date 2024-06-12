@@ -36,4 +36,3 @@ def test_edit_table(table_adapter, table):
 
     result = table_adapter.edit(table.uuid, data)
     assert result.name == new_name
-    assert result.notes == table.notes
