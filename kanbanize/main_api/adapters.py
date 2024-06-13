@@ -43,7 +43,7 @@ class IAdapter(ABC):
 
 
 class TaskAdapter(IAdapter):
-    location = os.getenv("ADAPTER_LOCATION", "localhost:2020/task")
+    location = os.getenv("TASK_URL", "localhost:2020/task")
 
     def create(self, object_: Task.dict) -> TaskResponse:
         response = super().create(object_)
@@ -59,7 +59,7 @@ class TaskAdapter(IAdapter):
 
 
 class TableAdapter(IAdapter):
-    location = "localhost"
+    location = os.getenv("TABLE_URL", "localhost:2020/table")
 
     def create(self, object_: Table.dict) -> TableResponse:
         return super().create(object_)
