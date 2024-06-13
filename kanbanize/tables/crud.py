@@ -16,7 +16,7 @@ class TablesAdapter(FirestoreAdapter):
     def get(self, uuid: TableUuid) -> TableResponse:
         return super().get(uuid)
 
-    def create(self, data: dict) -> TableResponse:
+    def create(self, data: Table) -> TableResponse:
         return super().create(new_object=data)
 
     def edit(self, uuid: TableUuid, data: dict) -> TableResponse:
