@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from kanbanize.main_api.adapters import TaskAdapter
+from kanbanize.main_api.adapters import TableAdapter, TaskAdapter
 from kanbanize.schemas import (
     Table,
     TableResponse,
@@ -15,18 +15,30 @@ table = APIRouter(prefix="/table", tags=["table"])
 
 
 @table.post("/create")
-async def create_table(table: Table) -> TableResponse:
-    return table
+async def create_table(
+    table: Table,
+    adapter: TableAdapter = Depends(TableAdapter),
+) -> TableResponse:
+    data = table.model_dump_json()
+    return adapter.create(data)
 
 
 @table.get("/get/{uuid}")
-async def get_table(uuid: TableUuid) -> TableResponse:
-    return uuid
+async def get_table(
+    uuid: TableUuid,
+    adapter: TableAdapter = Depends(TableAdapter),
+) -> TableResponse:
+    return adapter.get(uuid)
 
 
 @table.put("/edit/{uuid}")
-async def edit_table(uuid: TableUuid, table: Table) -> TableResponse:
-    return table
+async def edit_table(
+    uuid: TableUuid,
+    table: Table,
+    adapter: TableAdapter = Depends(TableAdapter),
+) -> TableResponse:
+    data = table.model_dump_json()
+    return adapter.edit(uuid, data)
 
 
 @task.post("/create")
