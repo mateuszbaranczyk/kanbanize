@@ -4,9 +4,6 @@ from abc import ABC, abstractmethod
 from requests import request
 
 from kanbanize.schemas import (
-    Group,
-    GroupResponse,
-    GroupUuid,
     Table,
     TableResponse,
     TableUuid,
@@ -59,19 +56,6 @@ class TaskAdapter(IAdapter):
     def edit(self, uuid: TaskUuid, object_: Task.dict) -> TaskResponse:
         response = super().edit(uuid, object_)
         return TaskResponse(**response)
-
-
-class GroupAdapter(IAdapter):
-    location = "localhost"
-
-    def create(self, object_: Group.dict) -> GroupResponse:
-        return super().create(object_)
-
-    def get(self, uuid: GroupUuid) -> GroupResponse:
-        return super().get(uuid)
-
-    def edit(self, uuid: GroupUuid, object_: Group.dict) -> GroupResponse:
-        return super().edit(uuid, object_)
 
 
 class TableAdapter(IAdapter):

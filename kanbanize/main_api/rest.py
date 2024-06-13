@@ -2,9 +2,6 @@ from fastapi import APIRouter, Depends
 
 from kanbanize.main_api.adapters import TaskAdapter
 from kanbanize.schemas import (
-    Group,
-    GroupResponse,
-    GroupUuid,
     Table,
     TableResponse,
     TableUuid,
@@ -15,7 +12,6 @@ from kanbanize.schemas import (
 
 task = APIRouter(prefix="/task", tags=["task"])
 table = APIRouter(prefix="/table", tags=["table"])
-group = APIRouter(prefix="/group", tags=["group"])
 
 
 @table.post("/create")
@@ -31,21 +27,6 @@ async def get_table(uuid: TableUuid) -> TableResponse:
 @table.put("/edit/{uuid}")
 async def edit_table(uuid: TableUuid, table: Table) -> TableResponse:
     return table
-
-
-@group.post("/create")
-async def create_group(group: Group) -> GroupResponse:
-    return group
-
-
-@group.get("/get/{uuid}")
-async def get_group(uuid: GroupUuid) -> GroupResponse:
-    return uuid
-
-
-@group.put("/edit/{uuid}")
-async def edit_group(uuid: GroupUuid, group: Group) -> GroupResponse:
-    return group
 
 
 @task.post("/create")
