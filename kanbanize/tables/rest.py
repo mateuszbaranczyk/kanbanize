@@ -33,9 +33,18 @@ async def get(uuid: TableUuid, db: firestore.Client = Depends(get_db)):
     return table
 
 
-@table.put("/edit")
-async def edit(db: firestore.Client = Depends(get_db)):
-    pass
+@table.put("/edit/{uuid}")
+async def edit(
+    uuid: TableUuid, data: dict, db: firestore.Client = Depends(get_db)
+):
+    adapter = crud.TablesAdapter(db)
+    try:
+        updated_table = adapter.edit(uuid, data)
+    except DocumentError:
+        raise HTTPException(500)
+    except NameError:
+        raise HTTPException(404)
+    return updated_table
 
 
 app.include_router(table)
