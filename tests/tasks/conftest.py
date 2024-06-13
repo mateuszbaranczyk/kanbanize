@@ -1,17 +1,8 @@
 from unittest.mock import patch
 
-from fastapi.testclient import TestClient
 from pytest import fixture
 
 from kanbanize.schemas import Task, TaskResponse
-from kanbanize.tasks.database import get_db
-from kanbanize.tasks.rest import app
-
-
-@fixture(autouse=True)
-def override_get_db(mock_db) -> None:
-    app.dependency_overrides[get_db] = mock_db
-    return None
 
 
 @fixture
@@ -23,12 +14,6 @@ def task() -> Task:
 @fixture
 def dumped_task(task) -> dict:
     return task.model_dump()
-
-
-@fixture
-def client() -> TestClient:
-    client = TestClient(app)
-    return client
 
 
 def create_new_task(mock_db, task) -> TaskResponse:
