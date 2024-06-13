@@ -19,6 +19,16 @@ def test_get_table(client, table, mock_db):
     assert response.status_code == 200
 
 
+def test_edit_table(client, table, mock_db):
+    table_uuid = create_new_table(mock_db=mock_db, table=table).uuid
+    new_name = "test table 2"
+    data = {"name": new_name}
+    response = client.put(f"tables/edit/{table_uuid}", json=data)
+
+    assert response.status_code == 200
+    assert response.json()["name"] == new_name
+
+
 def create_new_table(mock_db, table) -> TableResponse:
     new_table = TableResponse(**table.model_dump())
     mock_db.collection("tables").document(new_table.uuid).set(
