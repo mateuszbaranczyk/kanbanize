@@ -1,23 +1,32 @@
 from fastapi import APIRouter, Depends, FastAPI
 from google.cloud import firestore
 
+from kanbanize.schemas import Table, TableResponse, TableUuid
+from kanbanize.tables import crud
 from kanbanize.tables.database import get_db
 
 app = FastAPI()
 
-task = APIRouter(prefix="/tables")
+table = APIRouter(prefix="/tables")
 
 
-@task.post("/create")
-async def create(db: firestore.Client = Depends(get_db)):
+@table.post("/create")
+async def create(
+    table: Table, db: firestore.Client = Depends(get_db)
+) -> TableResponse:
+    adapter = crud.TablesAdapter(db)
+    table = adapter.create(data=table)
+    return table
+
+
+@table.get("get")
+async def get(uuid: TableUuid, db: firestore.Client = Depends(get_db)):
     pass
 
 
-@task.post("get(")
-async def get(db: firestore.Client = Depends(get_db)):
-    pass
-
-
-@task.post("/edit")
+@table.put("/edit")
 async def edit(db: firestore.Client = Depends(get_db)):
     pass
+
+
+app.include_router(table)
