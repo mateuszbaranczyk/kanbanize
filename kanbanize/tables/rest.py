@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, FastAPI
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from google.cloud import firestore
 
+from kanbanize.firestore_adapter import DocumentError
 from kanbanize.schemas import Table, TableResponse, TableUuid
 from kanbanize.tables import crud
 from kanbanize.tables.database import get_db
@@ -15,13 +16,21 @@ async def create(
     table: Table, db: firestore.Client = Depends(get_db)
 ) -> TableResponse:
     adapter = crud.TablesAdapter(db)
-    table = adapter.create(data=table)
+    try:
+        table = adapter.create(data=table)
+    except DocumentError:
+        raise HTTPException(500)
     return table
 
 
-@table.get("get")
+@table.get("/get/{uuid}")
 async def get(uuid: TableUuid, db: firestore.Client = Depends(get_db)):
-    pass
+    adapter = crud.TablesAdapter(db)
+    try:
+        table = adapter.get(uuid)
+    except NameError:
+        raise HTTPException(404)
+    return table
 
 
 @table.put("/edit")
