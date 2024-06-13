@@ -1,13 +1,6 @@
-from pytest import fixture, raises
+from pytest import raises
 
 from kanbanize.schemas import TABLE_PREFIX, TableResponse
-from kanbanize.tables.crud import TablesAdapter
-
-
-@fixture
-def table_adapter(mock_db):
-    adapter = TablesAdapter(mock_db)
-    return adapter
 
 
 def test_create_table(table_adapter, table):
