@@ -9,7 +9,7 @@ from kanbanize.tables.database import get_db
 
 app = FastAPI()
 
-table = APIRouter(prefix="/tables")
+table = APIRouter(prefix="/table")
 
 
 @app.get("/")
