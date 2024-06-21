@@ -8,7 +8,6 @@ TABLE_PREFIX = "tb"
 
 Uuid = NewType("Uuid", str)
 TaskUuid = NewType("TaskUuid", Uuid)
-GroupUuid = NewType("GroupUuid", Uuid)
 TableUuid = NewType("TableUuid", Uuid)
 
 
@@ -31,20 +30,8 @@ class TaskResponse(Task):
 
 class Table(BaseModel):
     name: str
-    tasks: list[TaskResponse] = []
-
-    group_uuid: GroupUuid = ""
+    tasks: list[TaskUuid] = []
 
 
 class TableResponse(Table):
-    uuid: TableUuid
-
-
-class Group(BaseModel):
-    name: str
-    project: str
-    tables: list[TableUuid] = []
-
-
-class GroupResponse(Group):
-    uuid: GroupUuid
+    uuid: TableUuid = create_uuid(TABLE_PREFIX)

@@ -132,3 +132,4 @@ dmypy.json
 auth.json
 html/
 .mutmut-cache
+.firebasetoken.json
