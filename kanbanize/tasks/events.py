@@ -1,12 +1,13 @@
 import os
 from abc import ABC, abstractmethod
 
-from kanbanize.rabbit_sender import RmqSender
+from rabbit_sender import RmqSender
+
 from kanbanize.schemas import TABLE_PREFIX, TaskResponse
 
 
 class TaskEvent(RmqSender, ABC):
-    host = os.getenv("RMQ_HOST", "localhost")
+    host = os.getenv("RMQ_HOST", "listener:listener@raspberry:5672")  # TODO
     queue = os.getenv("QUEUE", "tasks")
     exchange = os.getenv("EXCHANGE", "")
     routing_key = os.getenv("ROUTING_KEY", "tasks")
