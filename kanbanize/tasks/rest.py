@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
+from fastapi.responses import RedirectResponse
 from google.cloud import firestore
 
 from kanbanize.firestore_adapter import DocumentError
@@ -15,6 +16,11 @@ from kanbanize.validation import validate
 app = FastAPI()
 
 task = APIRouter(prefix="/task")
+
+
+@app.get("/")
+async def read_root():
+    return RedirectResponse("docs/")
 
 
 @task.post("/create")
