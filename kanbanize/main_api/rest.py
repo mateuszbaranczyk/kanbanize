@@ -20,7 +20,8 @@ async def create_table(
     adapter: TableAdapter = Depends(TableAdapter),
 ) -> TableResponse:
     data = table.model_dump_json()
-    return adapter.create(data)
+    response = adapter.create(data)
+    return response
 
 
 @table.get("/get/{uuid}")
