@@ -56,10 +56,10 @@ class RabbitWorker:
         table = adapter.get(table_uuid)
         match event:
             case "connected":
-                data = {"tasks": table.tasks.append(task_uuid)}
+                data = {"tasks": [table.tasks.append(task_uuid)]}
                 adapter.edit(table_uuid, data)
             case "disconnected":
-                data = {"tasks": table.tasks.remove(task_uuid)}
+                data = {"tasks": [table.tasks.remove(task_uuid)]}
                 adapter.edit(table_uuid)
         return None
 
