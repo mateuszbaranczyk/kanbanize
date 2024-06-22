@@ -2,48 +2,64 @@ import logging
 import os
 
 import pika
-
-logger = logging.getLogger()
-
-cred = pika.credentials.PlainCredentials(
-    username="listener", password="listener"
-)
-
-HOST = os.getenv("RMQ_HOST", "localhost")
-QUEUE = os.getenv("QUEUE", "tasks")
-EXCHANGE = os.getenv("EXCHANGE", "")
-ROUTING_KEY = os.getenv("ROUTING_KEY", "tasks")
-
-connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host=HOST, port=5672, credentials=cred)
-)
-channel = connection.channel()
-
-channel.queue_declare(queue=QUEUE, durable=True)
-
-
-def parse_message(msg: str):
-    table_uuid_pos = msg.find(" tb-")
-    task_uuid_pos = msg.find(" ta-")
-    table_uuid = msg[table_uuid_pos : table_uuid_pos + 39]  # noqa: E203
-    task_uuid = msg[task_uuid_pos : task_uuid_pos + 39]  # noqa: E203
-    return table_uuid, task_uuid
-
-
-def callback(ch, method, properties, body: bytes):
-    msg = str(body)
-    logger.info(msg)
-    table_uuid, task_uuid = parse_message(msg)
-    ch.basic_ack(delivery_tag=method.delivery_tag)
-    logger.info("Consumed", table_uuid, task_uuid)
-
-
-channel.basic_qos(prefetch_count=1)
-channel.basic_consume(queue=QUEUE, on_message_callback=callback)
-
-channel.start_consuming()
+from schemas import TableUuid, TaskUuid
 
 
 class RabbitWorker:
-    def __init__(self):
-        pass
+    HOST = os.getenv("RMQ_HOST", "localhost")
+    PORT = os.getenv("RMQ_PORT", 5672)
+    QUEUE = os.getenv("QUEUE", "tasks")
+    EXCHANGE = os.getenv("EXCHANGE", "")
+    ROUTING_KEY = os.getenv("ROUTING_KEY", "tasks")
+    USERNAME = os.getenv("USERNAME", "listener")
+    PASSWORD = os.getenv("PASSWORD", "listener")
+
+    def __init__(self) -> None:
+        self.logger = logging.getLogger("RabbitMQ")
+        connection = self.prepare_connection()
+        channel = connection.channel()
+        channel.queue_declare(queue=self.QUEUE, durable=True)
+        channel.basic_qos(prefetch_count=1)
+        channel.basic_consume(
+            queue=self.QUEUE, on_message_callback=self.callback
+        )
+        channel.start_consuming()
+        return None
+
+    def callback(self, ch, method, properties, body: bytes) -> None:
+        msg = str(body)
+        self.logger.info(msg)
+        table_uuid, task_uuid, event = self._parse_message(msg)
+        self.handle_event(event)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+        self.logger.info("Consumed", table_uuid, task_uuid)
+        return None
+
+    def handle_event(self, event: str) -> None:
+        match event:
+            case "connected":
+                pass
+            case "disconnected":
+                pass
+
+    def prepare_connection(self) -> None:
+        credensials = pika.credentials.PlainCredentials(
+            username=self.USERNAME, password=self.PASSWORD
+        )
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(
+                host=self.HOST, port=self.PORT, credentials=credensials
+            )
+        )
+        return connection
+
+    def _parse_message(self, msg: str) -> tuple[TableUuid, TaskUuid, str]:
+        table_uuid_pos = msg.find(" tb-")
+        task_uuid_pos = msg.find(" ta-")
+        uuid_len = 39
+        table_uuid = msg[
+            table_uuid_pos : table_uuid_pos + uuid_len  # noqa: E203
+        ]
+        task_uuid = msg[task_uuid_pos : task_uuid_pos + uuid_len]  # noqa: E203
+        event = "connected" if "connected" in msg else "disconnected"
+        return table_uuid, task_uuid, event
