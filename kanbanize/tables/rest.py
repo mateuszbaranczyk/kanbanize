@@ -6,10 +6,17 @@ from kanbanize.firestore_adapter import DocumentError
 from kanbanize.schemas import Table, TableResponse, TableUuid
 from kanbanize.tables import crud
 from kanbanize.tables.database import get_db
+from kanbanize.tables.listener import RabbitWorker
 
 app = FastAPI()
 
 table = APIRouter(prefix="/table")
+
+
+@app.on_event("startup")
+async def run_rabbit() -> None:
+    RabbitWorker()
+    return None
 
 
 @app.get("/")
