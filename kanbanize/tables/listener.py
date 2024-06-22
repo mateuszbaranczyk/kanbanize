@@ -3,7 +3,12 @@ import os
 
 import pika
 from crud import TablesAdapter
-from schemas import TableUuid, TaskUuid
+from google.cloud import firestore
+
+from kanbanize.schemas import TableUuid, TaskUuid
+
+project_id = os.getenv("FIRESTORE_PROJECT_ID", "dummy-firestore-id")
+database_name = os.getenv("DB_NAME", "kanbanize")
 
 
 class RabbitWorker:
@@ -12,8 +17,8 @@ class RabbitWorker:
     QUEUE = os.getenv("QUEUE", "tasks")
     EXCHANGE = os.getenv("EXCHANGE", "")
     ROUTING_KEY = os.getenv("ROUTING_KEY", "tasks")
-    USERNAME = os.getenv("USERNAME", "listener")
-    PASSWORD = os.getenv("PASSWORD", "listener")
+    USERNAME = os.getenv("RMQ_USERNAME", "listener")
+    PASSWORD = os.getenv("RMQ_PASSWORD", "listener")
 
     def __init__(self) -> None:
         self.logger = logging.getLogger("RabbitMQ")
@@ -25,21 +30,29 @@ class RabbitWorker:
             queue=self.QUEUE, on_message_callback=self.callback
         )
         channel.start_consuming()
+        self.logger.info("worker started")
         return None
 
     def callback(self, ch, method, properties, body: bytes) -> None:
         msg = str(body)
         self.logger.info(msg)
         table_uuid, task_uuid, event = self._parse_message(msg)
-        self.handle_event(event)
+        try:
+            self.handle_event(table_uuid, task_uuid, event)
+        except Exception:
+            self.logger.error(f"{Exception}")
         ch.basic_ack(delivery_tag=method.delivery_tag)
         self.logger.info("Consumed", table_uuid, task_uuid)
         return None
 
     def handle_event(
-        self, table_uuid: TableUuid, task_uuid: TaskUuid, event: str
+        self,
+        table_uuid: TableUuid,
+        task_uuid: TaskUuid,
+        event: str,
     ) -> None:
-        adapter = TablesAdapter()
+        db = firestore.Client(project=project_id, database=database_name)
+        adapter = TablesAdapter(db)
         table = adapter.get(table_uuid)
         match event:
             case "connected":
@@ -71,3 +84,7 @@ class RabbitWorker:
         task_uuid = msg[task_uuid_pos : task_uuid_pos + uuid_len]  # noqa: E203
         event = "connected" if "connected" in msg else "disconnected"
         return table_uuid, task_uuid, event
+
+
+if __name__ == "__main__":
+    worker = RabbitWorker()
