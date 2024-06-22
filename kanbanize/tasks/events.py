@@ -6,10 +6,12 @@ from kanbanize.tasks.rabbit_sender import RmqSender
 
 
 class TaskEvent(RmqSender, ABC):
-    host = os.getenv("RMQ_HOST", "listener:listener@raspberry:5672")  # TODO
+    host = os.getenv("RMQ_HOST", "localhost")
     queue = os.getenv("QUEUE", "tasks")
     exchange = os.getenv("EXCHANGE", "")
     routing_key = os.getenv("ROUTING_KEY", "tasks")
+    user = os.getenv("RMQ_USER", "listener")
+    password = os.getenv("RMQ_PASSWORD", "listener")
 
     def __init__(self, task: TaskResponse) -> None:
         super().__init__()
