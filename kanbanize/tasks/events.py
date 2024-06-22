@@ -1,9 +1,8 @@
 import os
 from abc import ABC, abstractmethod
 
-from rabbit_sender import RmqSender
-
 from kanbanize.schemas import TABLE_PREFIX, TaskResponse
+from kanbanize.tasks.rabbit_sender import RmqSender
 
 
 class TaskEvent(RmqSender, ABC):

@@ -2,10 +2,10 @@ import logging
 import os
 
 import pika
-from crud import TablesAdapter
 from google.cloud import firestore
 
 from kanbanize.schemas import TableUuid, TaskUuid
+from kanbanize.tables.crud import TablesAdapter
 
 project_id = os.getenv("FIRESTORE_PROJECT_ID", "dummy-firestore-id")
 database_name = os.getenv("DB_NAME", "kanbanize")
