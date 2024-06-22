@@ -2,6 +2,7 @@ import logging
 import os
 
 import pika
+from crud import TablesAdapter
 from schemas import TableUuid, TaskUuid
 
 
@@ -35,12 +36,19 @@ class RabbitWorker:
         self.logger.info("Consumed", table_uuid, task_uuid)
         return None
 
-    def handle_event(self, event: str) -> None:
+    def handle_event(
+        self, table_uuid: TableUuid, task_uuid: TaskUuid, event: str
+    ) -> None:
+        adapter = TablesAdapter()
+        table = adapter.get(table_uuid)
         match event:
             case "connected":
-                pass
+                data = {"tasks": table.tasks.append(task_uuid)}
+                adapter.edit(table_uuid, data)
             case "disconnected":
-                pass
+                data = {"tasks": table.tasks.remove(task_uuid)}
+                adapter.edit(table_uuid)
+        return None
 
     def prepare_connection(self) -> None:
         credensials = pika.credentials.PlainCredentials(
