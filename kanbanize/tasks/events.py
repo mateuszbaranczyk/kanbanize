@@ -1,8 +1,8 @@
 import os
 from abc import ABC, abstractmethod
 
-from kanbanize.rabbit_sender import RmqSender
 from kanbanize.schemas import TABLE_PREFIX, TaskResponse
+from kanbanize.tasks.rabbit_sender import RmqSender
 
 
 class TaskEvent(RmqSender, ABC):
@@ -10,6 +10,8 @@ class TaskEvent(RmqSender, ABC):
     queue = os.getenv("QUEUE", "tasks")
     exchange = os.getenv("EXCHANGE", "")
     routing_key = os.getenv("ROUTING_KEY", "tasks")
+    user = os.getenv("RMQ_USER", "listener")
+    password = os.getenv("RMQ_PASSWORD", "listener")
 
     def __init__(self, task: TaskResponse) -> None:
         super().__init__()
