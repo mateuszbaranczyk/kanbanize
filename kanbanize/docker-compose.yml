@@ -1,0 +1,41 @@
+services:
+  mainapi:
+    container_name: kanbanize-main
+    image: kundzior/kanbanize:main
+    environment:
+      - TASK_URL=localhost:8888/task
+      - TABLE_URL=localhost:9999/table
+    ports:
+      - "8000:8000"
+    network_mode: host
+  
+  tasks:
+    container_name: kanbanize-tasks
+    image: kundzior/kanbanize:tasks
+    environment:
+      - RMQ_HOST=localhost
+      - QUEUE=tasks
+      - ROUTING_KEY=tasks
+      - RMQ_USER=listener
+      - RMQ_PASSWORD=listener
+      - FIRESTORE_PROJECT_ID=dummy-firestore-id
+      - DB_NAME=kanbanize
+    ports:
+      - "8888:8888"
+    network_mode: host
+
+  tables:
+    container_name: kanbanize-tables
+    image: kundzior/kanbanize:tables
+    environment:
+      - RMQ_HOST=localhost
+      - RMQ_PORT=5672
+      - QUEUE=tasks
+      - ROUTING_KEY=tasks
+      - RMQ_USER=listener
+      - RMQ_PASSWORD=listener
+      - FIRESTORE_PROJECT_ID=dummy-firestore-id
+      - DB_NAME=kanbanize
+    ports:
+      - "9999:9999"
+    network_mode: host
